@@ -5,6 +5,7 @@
 // @description  try to take over the world!
 // @author       Ambitious
 // @match        http://127.0.0.1:12138
+// @match        http://localhost:12138
 // @icon         https://blog.ambitiousjun.cn/assets/logo.753a5060.jpg
 
 // @require      https://cdn.jsdelivr.net/npm/sweetalert2@11
@@ -56,7 +57,8 @@
       color: #909399;
     }
 
-    .auto-recheck-switch-container .count-down-wrap {
+    .auto-recheck-switch-container .count-down-wrap,
+    .auto-recheck-switch-container .success-count {
       font-size: 18px;
       color: #409eff;
       padding: 20px;
@@ -197,6 +199,10 @@
    * 删除倒计时器
    */
   let removeCountDownTimer = null;
+  /**
+   * 成功校验次数
+   */
+  let successCount = 0;
 
   /**
    * 生成一个弹框
@@ -294,6 +300,8 @@
     })
     removeCountDownElement();
     startCountDown(timeout)();
+    successCount++;
+    doms.successCountElm.innerHTML = `已成功校验 ${successCount} 次`;
   }
 
   /**
@@ -389,9 +397,31 @@
   }
 
   /**
+   * 添加标签，展示当前成功校验的次数
+   */
+  const addSuccessCountElement = () => {
+    const successCountElm = document.createElement('div');
+    successCountElm.classList.add('success-count');
+    successCountElm.innerHTML = `已成功校验 ${successCount} 次`;
+    doms.successCountElm = successCountElm;
+    doms.rightWrap.appendChild(successCountElm);
+  }
+
+  /**
+   * 删除成功校验次数标签
+   */
+  const removeSuccessCountElement = () => {
+    if (doms.successCountElm) {
+      doms.successCountElm.remove();
+      doms.successCountElm = null;
+    }
+  }
+
+  /**
    * 开启自动校验计时
    */
   const startTimer = () => {
+    successCount = 0;
     // 弹框输入间隔时间
     injectAlertAndGetTimeout().then((t) => {
       timeout = t;
@@ -416,6 +446,7 @@
         timer: 2000,
         timerProgressBar: true
       })
+      addSuccessCountElement();
       // 开始计时, TODO: 等写计时器的时候再重写这里的逻辑
       startCountDown(timeout)();
       // 修改提示文本内容
@@ -442,6 +473,8 @@
     removeCountDownTimer();
     // 删除计时文本
     removeCountDownElement();
+    // 删除成功次数文本
+    removeSuccessCountElement();
     timerEnable = false;
   }
 
