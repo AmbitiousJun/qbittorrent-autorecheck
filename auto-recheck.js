@@ -396,7 +396,7 @@
         }
         doms.countDown.innerHTML = `下一次校验时间：${formatTimestamp2Str(millis)}`;
         cd();
-      }, 500);
+      }, 1000);
       removeCountDownTimer = () => clearTimeout(timerId);
     }
   }
