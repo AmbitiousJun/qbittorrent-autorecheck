@@ -290,7 +290,7 @@
         }
       }
     }
-    getFire({
+    timerEnable && getFire({
       icon: 'success',
       title: '所有任务校验完成，下一次校验开始时间：\n\n\n\n' + dayjs(new Date((new Date().getTime() + timeout * 60 * 1000))).format('YYYY/MM/DD HH:mm:ss'),
       showConfirmButton: false,
@@ -299,9 +299,9 @@
       timerProgressBar: true
     })
     removeCountDownElement();
-    startCountDown(timeout)();
     successCount++;
     doms.successCountElm.innerHTML = `已成功校验 ${successCount} 次`;
+    timerEnable && startCountDown(timeout)();
   }
 
   /**
@@ -310,7 +310,7 @@
   const startReCheck = () => {
     const items = getTaskItems();
     if (items.length === 0) {
-      getFire({
+      timerEnable && getFire({
         icon: 'info',
         title: '任务列表为空或所有任务都以下载完成，定时器关闭',
         showConfirmButton: false,
@@ -327,7 +327,7 @@
     }
     // 取消对最后一项的选择效果
     items[items.length - 1].classList.remove('selected');
-    getFire({
+    timerEnable && getFire({
       icon: 'info',
       title: '所有下载任务重新开始校验...',
       showConfirmButton: false,
@@ -374,7 +374,10 @@
    * 倒计时 minutes 分钟数，并在界面上显示，倒计时结束之后调用校验函数
    */
   const startCountDown = (minutes = 0) => {
+    // 剩余多久时间
     let millis = minutes * 60 * 1000;
+    // 获取到计时结束的时间戳
+    const to = performance.now() + millis;
     addCountDownElement(millis);
     let timerId = null;
     return function cd() {
@@ -384,14 +387,16 @@
         startReCheck();
         return;
       }
+      // 使用 setTimeout 可能会导致后台计时不准确
       timerId = setTimeout(() => {
-        millis -= 1000;
+        // 计算剩余时间
+        millis = to - performance.now();
         if (millis < 0) {
           millis = 0;
         }
         doms.countDown.innerHTML = `下一次校验时间：${formatTimestamp2Str(millis)}`;
         cd();
-      }, 1000);
+      }, 500);
       removeCountDownTimer = () => clearTimeout(timerId);
     }
   }
