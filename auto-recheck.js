@@ -335,7 +335,7 @@
       timer: 1500,
       timerProgressBar: true
     })
-    setTimeout(checkReCheckFinish, 5000);
+    setTimeout(checkReCheckFinish, 10000);
   }
 
   /**
