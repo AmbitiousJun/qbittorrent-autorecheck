@@ -279,29 +279,27 @@
   /**
    * 检查任务列表中的 “校验” 任务，所有任务完成之后重新开始计时
    */
-  const checkReCheckFinish = () => {
-    const items = document.getElementsByClassName('torrentsTableContextMenuTarget') || [];
-    for (let i = 0; i < items.length; i++) {
-      let tds = items[i].getElementsByTagName('td');
-      for (let j = 0; j < tds.length; j++) {
-        if (tds[j].innerHTML.indexOf('校验') !== -1) {
-          setTimeout(checkReCheckFinish, 1000);
+  const checkReCheckFinish = (items = []) => {
+    return () => {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].innerHTML.indexOf('校验') !== -1) {
+          setTimeout(checkReCheckFinish(items), 2000);
           return;
         }
       }
+      timerEnable && getFire({
+        icon: 'success',
+        title: '所有任务校验完成，下一次校验开始时间：\n\n\n\n' + dayjs(new Date((new Date().getTime() + timeout * 60 * 1000))).format('YYYY/MM/DD HH:mm:ss'),
+        showConfirmButton: false,
+        width: '50em',
+        timer: 5000,
+        timerProgressBar: true
+      })
+      removeCountDownElement();
+      successCount++;
+      doms.successCountElm.innerHTML = `已成功校验 ${successCount} 次`;
+      timerEnable && startCountDown(timeout)();
     }
-    timerEnable && getFire({
-      icon: 'success',
-      title: '所有任务校验完成，下一次校验开始时间：\n\n\n\n' + dayjs(new Date((new Date().getTime() + timeout * 60 * 1000))).format('YYYY/MM/DD HH:mm:ss'),
-      showConfirmButton: false,
-      width: '50em',
-      timer: 5000,
-      timerProgressBar: true
-    })
-    removeCountDownElement();
-    successCount++;
-    doms.successCountElm.innerHTML = `已成功校验 ${successCount} 次`;
-    timerEnable && startCountDown(timeout)();
   }
 
   /**
@@ -335,7 +333,7 @@
       timer: 1500,
       timerProgressBar: true
     })
-    setTimeout(checkReCheckFinish, 10000);
+    setTimeout(checkReCheckFinish(items), 10000);
   }
 
   /**
